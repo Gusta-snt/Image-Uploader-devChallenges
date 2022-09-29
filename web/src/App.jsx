@@ -10,6 +10,8 @@ function App() {
     const dragDropBox = document.querySelector("#drag-drop-box")
     const text = document.querySelector("#text")
 
+    const childrenDragDropBox = Array.from(dragDropBox.childNodes)
+
     const file = document.querySelector("#fileInput").files[0] 
     if(file.type.split("/")[0] !== "image"){
       changeDragDropBoxMessage("The file need to be an image!")
@@ -45,6 +47,7 @@ function App() {
 
     const childrenDragDropBox = Array.from(dragDropBox.childNodes)
 
+    changeDragDropBoxMessage("Drop the file here!")
     childrenDragDropBox.map((child) => child.style.display = "none")
     text.style.display = "block"
 
@@ -61,12 +64,11 @@ function App() {
     const children = Array.from(dragDropBox.childNodes)
 
     children.map((child) => child.style.display = "block")
-    changeDragDropBoxMessage("Drop the file here!")
     text.style.display = "none"
   }
 
   function changeDragDropBoxMessage(message) {
-    const Text = document.querySelector("#text")
+    const text = document.querySelector("#text")
     text.textContent = message
   }
 
