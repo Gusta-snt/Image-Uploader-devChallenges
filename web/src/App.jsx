@@ -1,12 +1,16 @@
-import * as Progress from '@radix-ui/react-progress';
+import { useEffect, useState } from 'react'
 
 import './app.css'
 import exampleImage from './assets/exampleImage.svg'
 
+import ImageScreen from './screens/ImageScreen'
+import LoadingScreen from './screens/LoadingScreen'
+
 function App() {
 
-  /*<span class="material-symbols-outlined">check_circle</span>*/
-  function submitFileChooseFileButton(event) {
+  const [url, setUrl] = useState("")
+
+  async function submitFileChooseFileButton(event) {
     event.preventDefault()
 
     const dragDropBox = document.querySelector("#drag-drop-box")
@@ -21,11 +25,16 @@ function App() {
       text.style.display = "block"
       return
     }
-    console.log("send Image")
+
     changeScreen("#form-screen", "#loading-screen")
+
+    const imageUrl = await sendImage(file)
+    setUrl(imageUrl.url)
+    
+    changeScreen("#loading-screen","#image-screen")
   }
 
-  function submitDragDropBox(event) {
+  async function submitDragDropBox(event) {
     event.preventDefault();
 
     if(event.dataTransfer.items){
@@ -33,8 +42,14 @@ function App() {
       const file = event.dataTransfer.items[0].getAsFile()
 
       if(file.type.split("/")[0] === "image"){
-        console.log("send Image")
+
         changeScreen("#form-screen", "#loading-screen")
+
+        const imageUrl = await sendImage(file)
+        setUrl(imageUrl.url)
+
+        changeScreen("#loading-screen","#image-screen")
+
       }else{
         changeDragDropBoxMessage("The file need to be an image!")
       }
@@ -87,6 +102,19 @@ function App() {
     newScreen.style.display = "flex"
   }
 
+  async function sendImage(image) {
+    const formData = new FormData()
+    formData.append("img", image)
+
+    let url = await fetch("http://localhost:3000/", {
+      method: "POST",
+      body: formData
+    })
+    url = url.json()
+
+    return url
+  }
+
   return (
     <div className="bg-white shadow-principal rounded-xl flex justify-center">
       <section id="form-screen" className="mx-8 my-9">
@@ -106,13 +134,9 @@ function App() {
         </form>
       </section>
 
-      <section id="loading-screen" className="hidden flex flex-col">
-        <h2 className="text-lg text-[#4F4F4F] leading-[0.937rem] tracking-[-0.035em] ml-8 mt-9">Uploading...</h2>
+      <LoadingScreen id="loading-screen"/>
 
-        <Progress.Root className="h-[6px] w-[340px] bg-[#F2F2F2] rounded-[8px] mt-[31px] mb-[43px] mx-8 overflow-hidden">
-          <Progress.Indicator className="h-[100%] w-[100px] bg-[#2F80ED] rounded-[8px] animate-progress"/>
-        </Progress.Root>
-      </section>
+      <ImageScreen url={url} id="image-screen"/>
     </div>
   )
 }
