@@ -1,4 +1,21 @@
+import { useState } from 'react'
+
 function ImageScreen({url,id}) {
+
+  const [isCopied,setIsCopied] = useState(false)
+
+  async function copyUrl() {
+    
+    if("clipboard" in navigator){
+      setIsCopied(true)
+      return await navigator.clipboard.writeText(url)
+    }else{
+      return alert("This browser does not supports copy and paste. Please, use another browser!")
+    }
+
+  }
+
+
 	return (
 		<section 
 			id={id} 
@@ -68,12 +85,12 @@ function ImageScreen({url,id}) {
         ">
           {url}
         </p>
-        <button className="
+        <button onClick={copyUrl} id="copy-button" className="
           ml-[15px] 
           py-[9px] 
           px-[20px] 
           rounded-lg 
-          bg-[#2F80ED] 
+          bg-[#2F80ED]
           text-xs 
           text-white 
           leading-[1rem] 
@@ -81,7 +98,7 @@ function ImageScreen({url,id}) {
           hover:bg-[#186CF0] 
           whitespace-nowrap
         ">
-          Copy link
+          { isCopied ? "Copied!" : "Copy Link" }
         </button>
       </div>
     </section>
